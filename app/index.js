@@ -1,3 +1,4 @@
+// import { paddleCollision } from "./modules/paddles/paddleRight";
 console.log("hello");
 // mise en place et definition du canvas
 const canvas = document.getElementById("myCanvas");
@@ -152,45 +153,54 @@ function shifLeftPaddle() {
   }
 }
 
-function paddleCollision() {
-      // Collision avec la raquette gauche
+function paddleLeftCollision() {
+  // Collision avec la raquette gauche
+  if (
+      x - ballRadius < startPositionOfLeftPaddleX + paddleWidth &&
+      x + ballRadius > startPositionOfLeftPaddleX &&
+      y > startPositionOfLeftPaddleY &&
+      y < startPositionOfLeftPaddleY + paddleHeight
+    ) {
+      dx = -dx; // Inverser la direction horizontale
       if (
-        x - ballRadius < startPositionOfLeftPaddleX + paddleWidth &&
-        x + ballRadius > startPositionOfLeftPaddleX &&
-        y > startPositionOfLeftPaddleY &&
-        y < startPositionOfLeftPaddleY + paddleHeight
+        y - ballRadius < startPositionOfLeftPaddleY + paddleHeight &&
+        y + ballRadius > startPositionOfLeftPaddleY &&
+        x > startPositionOfLeftPaddleX &&
+        x < startPositionOfLeftPaddleX + paddleWidth
       ) {
-        dx = -dx; // Inverser la direction horizontale
-        if (
-          y - ballRadius < startPositionOfLeftPaddleY + paddleHeight &&
-          y + ballRadius > startPositionOfLeftPaddleY &&
-          x > startPositionOfLeftPaddleX &&
-          x < startPositionOfLeftPaddleX + paddleWidth
-        ) {
-          dy = -dy; // Inverser la direction verticale
-          
-        }
+        dy = -dy; // Inverser la direction verticale
+        
       }
-    
-      // Collision avec la raquette droite
-      if (
-        x + ballRadius > startPositionOfRightPaddleX &&
-        x - ballRadius < startPositionOfRightPaddleX + paddleWidth &&
-        y > startPositionOfRightPaddleY &&
-        y < startPositionOfRightPaddleY + paddleHeight
-      ) {
-        dx = -dx; // Inverser la direction horizontale
-        if (
-          y + ballRadius < startPositionOfLeftPaddleY + paddleHeight &&
-          y - ballRadius > startPositionOfLeftPaddleY &&
-          x > startPositionOfLeftPaddleX &&
-          x < startPositionOfLeftPaddleX + paddleWidth
-        ) {
-          dy = -dy; // Inverser la direction verticale
-          
-        }
-      }
+    }
 }
+
+function paddleRightCollision() {
+    // Collision avec la raquette droite
+    if (
+      x + ballRadius > startPositionOfRightPaddleX &&
+      x - ballRadius < startPositionOfRightPaddleX + paddleWidth &&
+      y > startPositionOfRightPaddleY &&
+      y < startPositionOfRightPaddleY + paddleHeight
+    ) {
+      dx = -dx; // Inverser la direction horizontale
+      if (
+        y + ballRadius < startPositionOfLeftPaddleY + paddleHeight &&
+        y - ballRadius > startPositionOfLeftPaddleY &&
+        x > startPositionOfLeftPaddleX &&
+        x < startPositionOfLeftPaddleX + paddleWidth
+      ) {
+        dy = -dy; // Inverser la direction verticale
+        
+      }
+    }
+} 
+
+function paddleCollision() {
+  paddleLeftCollision()
+  paddleRightCollision()
+  
+}
+
 
 
 

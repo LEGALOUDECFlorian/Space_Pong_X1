@@ -30,6 +30,9 @@ function randomStartLuncher() {
   randomNumber = parseInt(numbers[Math.floor(Math.random() * 3)]);
   return randomDirection === "+" ? randomNumber : -randomNumber;
 }
+//initialisation du score
+let leftScore = 0;
+let rightScore = 0;
 // fonction pour le départ de la balle
 // function startGameBall() {
 // //direction du mouvement de la balle
@@ -61,7 +64,7 @@ function drawLeftPaddle() {
     paddleWidth,
     paddleHeight
   );
-  ctx.fillStyle = "#219B8B";
+  ctx.fillStyle = "#FA40E4";
   ctx.fill();
   ctx.closePath();
 }
@@ -74,7 +77,7 @@ function drawRightPaddle() {
     paddleWidth,
     paddleHeight
   );
-  ctx.fillStyle = "#84154E";
+  ctx.fillStyle = "#4EF349";
   ctx.fill();
   ctx.closePath();
 }
@@ -175,25 +178,24 @@ function paddleLeftCollision() {
 }
 
 function paddleRightCollision() {
-    // Collision avec la raquette droite
-    if (
+  // Collision avec la raquette droite
+  if (
       x + ballRadius > startPositionOfRightPaddleX &&
       x - ballRadius < startPositionOfRightPaddleX + paddleWidth &&
       y > startPositionOfRightPaddleY &&
       y < startPositionOfRightPaddleY + paddleHeight
-    ) {
+  ) {
       dx = -dx; // Inverser la direction horizontale
       if (
-        y + ballRadius < startPositionOfLeftPaddleY + paddleHeight &&
-        y - ballRadius > startPositionOfLeftPaddleY &&
-        x > startPositionOfLeftPaddleX &&
-        x < startPositionOfLeftPaddleX + paddleWidth
+          y + ballRadius > startPositionOfRightPaddleY &&
+          y - ballRadius < startPositionOfRightPaddleY + paddleHeight &&
+          x > startPositionOfRightPaddleX &&
+          x < startPositionOfRightPaddleX + paddleWidth
       ) {
-        dy = -dy; // Inverser la direction verticale
-        
+          dy = -dy; // Inverser la direction verticale
       }
-    }
-} 
+  }
+}
 
 function paddleCollision() {
   paddleLeftCollision()
@@ -210,10 +212,75 @@ function bounceWall() {
   dy = -dy;
 }
 //rebond de la balle sur les murs droite || gauche
-if (x + dx > canvas.width - ballRadius || x + dx < ballRadius) {
- dx = -dx;
+// if (x + dx > canvas.width - ballRadius || x + dx < ballRadius) {
+//  dx = -dx;
+// }
 }
+
+function resetBall() {
+  x = canvas.width / 2;
+  y = canvas.height / 2;
+  dx = randomStartLuncher();
+  dy = randomStartLuncher();
 }
+
+function scorePlayerLeft() {
+  if (x + dx < ballRadius) {
+    rightScore += 1;
+   resetBall();
+  }
+
+}
+
+function scorePlayerRight() {
+  if (x + dx > canvas.width - ballRadius ) {
+    leftScore += 1;
+   resetBall();
+  }
+
+}
+
+function scoreGame() {
+  scorePlayerLeft()
+  scorePlayerRight()
+}
+
+function drawScorePlayerLeft() {
+  ctx.font = "16px Arial";
+  ctx.fillStyle = "#0095DD";
+  ctx.fillText("Player  1 : ", 28, 40);
+  ctx.fillText(leftScore, 38, 60)
+}
+
+function drawScorePlayerRight() {
+  ctx.font = "16px Arial";
+  ctx.fillStyle = "#0095DD";
+  ctx.fillText("Player 2 :", 830, 40);
+  ctx.fillText(rightScore, 882, 60)
+}
+
+function drawScore() {
+  drawScorePlayerLeft();
+  drawScorePlayerRight()
+}
+// truc pour faire des essaies
+function drawtips() {
+  
+
+     // créer un nouvel objet image à utiliser comme modèle
+  var img = new Image();
+  img.src = "https://c4.wallpaperflare.com/wallpaper/796/698/345/artistic-pixel-art-8-bit-wallpaper-preview.jpg";
+  img.onload = function () {
+    // créer le modèle
+    var ptrn = ctx.createPattern(img, "repeat");
+    ctx.fillStyle = ptrn;
+    ctx.fillRect(0, 0, 920, 640);
+}
+ 
+}
+
+
+
 
 //peindre le jeu
 function draw() {
@@ -224,8 +291,9 @@ function draw() {
   drawBall();
   bounceWall()
   paddleCollision();
-  
-  
+  // drawtips()
+  drawScore()
+  scoreGame()
 
   shifRightPaddle();
   shifLeftPaddle();

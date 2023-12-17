@@ -35,9 +35,9 @@ function randomStartLuncher() {
   return randomDirection === "+" ? randomNumber : -randomNumber;
 }
 //initialisation du score
-const score = [0, 0];
-let leftScore = 0;
-let rightScore = 0;
+const scores = [0, 0];
+// let leftScore = 0;
+// let rightScore = 0;
 
 //direction du mouvement de la balle
 let dx = randomStartLuncher();
@@ -54,22 +54,18 @@ document.addEventListener("keyup", keyUpHandlerRightPaddle, false);
 // gestionnaires d'événements pour le déplacement de la raquette de droite
 document.addEventListener("keydown", keyDownHandlerLeftPaddle, false);
 document.addEventListener("keyup", keyUpHandlerLeftPaddle, false);
-// fonction pour dessiner une raquette
-function drawPaddle(paddle) {
-  ctx.beginPath();
-  ctx.rect(paddle.x, paddle.y, paddleWidth, paddleHeight);
-  ctx.fillStyle = paddle.color;
-  ctx.fill();
-  ctx.closePath();
-}
-// peindre la balle
-function drawBall() {
-  ctx.beginPath();
-  ctx.arc(x, y, ballRadius, 0, Math.PI * 2);
-  ctx.fillStyle = ballColor;
-  ctx.fill();
-  ctx.closePath();
-}
+
+// gestion de la collision contre les murs
+function bounceWall() {
+  //rebond de la balle sur les murs inferieur || supérieur
+  if (y + dy > canvas.height - ballRadius || y + dy < ballRadius) {
+   dy = -dy;
+ }
+ //rebond de la balle sur les murs droite || gauche
+ // if (x + dx > canvas.width - ballRadius || x + dx < ballRadius) {
+ //  dx = -dx;
+ // }
+ }
 //fonctions relative au déplacement de la raquette droite
 function keyDownHandlerRightPaddle(e) {
   if (e.key == "ArrowUp") {
@@ -90,7 +86,7 @@ function keyUpHandlerRightPaddle(e) {
   }
 }
 
-//fonctions relative au déplacement de la raquette droite
+//fonctions relative au déplacement de la raquette gauche
 function keyDownHandlerLeftPaddle(e) {
   if (e.key == "q") {
     leftUpPressed = true;
@@ -181,16 +177,6 @@ function paddleCollision() {
 
 
 
-function bounceWall() {
- //rebond de la balle sur les murs inferieur || supérieur
- if (y + dy > canvas.height - ballRadius || y + dy < ballRadius) {
-  dy = -dy;
-}
-//rebond de la balle sur les murs droite || gauche
-// if (x + dx > canvas.width - ballRadius || x + dx < ballRadius) {
-//  dx = -dx;
-// }
-}
 
 function resetBall() {
   x = canvas.width / 2;
@@ -199,44 +185,28 @@ function resetBall() {
   dy = randomStartLuncher();
 }
 
-function scorePlayerLeft() {
+function updateScore(player) {
+  scores[player] += 1;
+  
+}
+
+function checkScore() {
   if (x + dx < ballRadius) {
-    rightScore += 1;
-   resetBall();
-  }
-
+    updateScore(1);
+    resetBall(); 
+  } else if (x + dx > canvas.width - ballRadius ) {
+    updateScore(0);
+    resetBall(); 
+  } 
 }
-
-function scorePlayerRight() {
-  if (x + dx > canvas.width - ballRadius ) {
-    leftScore += 1;
-   resetBall();
-  }
-
-}
-
-function scoreGame() {
-  scorePlayerLeft()
-  scorePlayerRight()
-}
-
-function drawScorePlayerLeft() {
-  ctx.font = "16px Arial";
-  ctx.fillStyle = "#0095DD";
-  ctx.fillText("Player  1 : ", 28, 40);
-  ctx.fillText(leftScore, 38, 60)
-}
-
-function drawScorePlayerRight() {
-  ctx.font = "16px Arial";
-  ctx.fillStyle = "#0095DD";
-  ctx.fillText("Player 2 :", 830, 40);
-  ctx.fillText(rightScore, 882, 60)
-}
-
+// dessiner les scores
 function drawScore() {
-  drawScorePlayerLeft();
-  drawScorePlayerRight()
+  ctx.font = "16px Arial";
+  ctx.fillStyle = "#0095DD";
+  ctx.fillText("Player  1 :", 28, 40);
+  ctx.fillText(scores[0], 38, 60)
+  ctx.fillText("Player 2 :", 830, 40);
+  ctx.fillText(scores[1], 882, 60)
 }
 // truc pour faire des essaies
 function drawtips() {
@@ -254,6 +224,23 @@ function drawtips() {
  
 }
 
+// fonction pour dessiner une raquette
+function drawPaddle(paddle) {
+  ctx.beginPath();
+  ctx.rect(paddle.x, paddle.y, paddleWidth, paddleHeight);
+  ctx.fillStyle = paddle.color;
+  ctx.fill();
+  ctx.closePath();
+}
+// peindre la balle
+function drawBall() {
+  ctx.beginPath();
+  ctx.arc(x, y, ballRadius, 0, Math.PI * 2);
+  ctx.fillStyle = ballColor;
+  ctx.fill();
+  ctx.closePath();
+}
+
 
 
 
@@ -261,8 +248,6 @@ function drawtips() {
 function draw() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-  // drawLeftPaddle();
-  // drawRightPaddle();
   drawPaddle(rightPaddle);
   drawPaddle(leftPaddle);
   
@@ -271,13 +256,9 @@ function draw() {
   bounceWall();
   shiftPaddles();
   paddleCollision();
-
+  checkScore();
   drawScore()
-  scoreGame()
  
-
-  // shifRightPaddle();
-  // shifLeftPaddle();
   x += dx;
   y += dy;
 }

@@ -6,15 +6,19 @@ const ctx = canvas.getContext("2d");
 // infos de la raquette
 const paddleHeight = 75;
 const paddleWidth = 10;
-//position de la raquette sur l'axe Y (verticale)
-let startPositionOfRightPaddleY = (canvas.height - paddleHeight) / 2;
-let startPositionOfLeftPaddleY = (canvas.height - paddleHeight) / 2;
-//position de la raquette sur l'axe X (horizontale)
-// raqette gauche
-let startPositionOfLeftPaddleX = canvas.width / 6 - paddleHeight;
-// raqette droite
-let startPositionOfRightPaddleX =
-  canvas.width - startPositionOfLeftPaddleX - paddleWidth;
+// information sur les raquettes
+const leftPaddle = {
+  x : canvas.width / 6 - paddleHeight,
+  y : (canvas.height - paddleHeight) / 2,
+  color : "#FA40E4",
+}
+const rightPaddle = {
+  x : canvas.width - leftPaddle.x - paddleWidth,
+  y : (canvas.height - paddleHeight) / 2,
+  color : "#4EF349",
+}
+const paddles = [leftPaddle, rightPaddle];
+
 //info de la balle
 const ballRadius = 10;
 const ballColor = "	#D742F5";
@@ -22,7 +26,7 @@ const ballColor = "	#D742F5";
 let x = canvas.width / 2;
 let y = canvas.height / 2;
 
-//mouvement aléatoire de la balle
+//mouvement aléatoire de la balle au lancement du jeu
 function randomStartLuncher() {
   const symboles = "+-";
   const numbers = "234";
@@ -31,15 +35,10 @@ function randomStartLuncher() {
   return randomDirection === "+" ? randomNumber : -randomNumber;
 }
 //initialisation du score
+const score = [0, 0];
 let leftScore = 0;
 let rightScore = 0;
-// fonction pour le départ de la balle
-// function startGameBall() {
-// //direction du mouvement de la balle
-// let dx = randomStartLuncher();
-// let dy = randomStartLuncher();
 
-// }
 //direction du mouvement de la balle
 let dx = randomStartLuncher();
 let dy = randomStartLuncher();
@@ -55,33 +54,15 @@ document.addEventListener("keyup", keyUpHandlerRightPaddle, false);
 // gestionnaires d'événements pour le déplacement de la raquette de droite
 document.addEventListener("keydown", keyDownHandlerLeftPaddle, false);
 document.addEventListener("keyup", keyUpHandlerLeftPaddle, false);
-
-function drawLeftPaddle() {
+// fonction pour dessiner une raquette
+function drawPaddle(paddle) {
   ctx.beginPath();
-  ctx.rect(
-    startPositionOfLeftPaddleX,
-    startPositionOfLeftPaddleY,
-    paddleWidth,
-    paddleHeight
-  );
-  ctx.fillStyle = "#FA40E4";
+  ctx.rect(paddle.x, paddle.y, paddleWidth, paddleHeight);
+  ctx.fillStyle = paddle.color;
   ctx.fill();
   ctx.closePath();
 }
-
-function drawRightPaddle() {
-  ctx.beginPath();
-  ctx.rect(
-    startPositionOfRightPaddleX,
-    startPositionOfRightPaddleY,
-    paddleWidth,
-    paddleHeight
-  );
-  ctx.fillStyle = "#4EF349";
-  ctx.fill();
-  ctx.closePath();
-}
-
+// peindre la balle
 function drawBall() {
   ctx.beginPath();
   ctx.arc(x, y, ballRadius, 0, Math.PI * 2);
@@ -109,19 +90,6 @@ function keyUpHandlerRightPaddle(e) {
   }
 }
 
-function shifRightPaddle() {
-  if (rightDownPressed) {
-    startPositionOfRightPaddleY += 7;
-    if (startPositionOfRightPaddleY + paddleHeight > canvas.height) {
-      startPositionOfRightPaddleY = canvas.height - paddleHeight;
-    }
-  } else if (rightUpPressed) {
-    startPositionOfRightPaddleY -= 7;
-    if (startPositionOfRightPaddleY < 0) {
-      startPositionOfRightPaddleY = 0;
-    }
-  }
-}
 //fonctions relative au déplacement de la raquette droite
 function keyDownHandlerLeftPaddle(e) {
   if (e.key == "q") {
@@ -142,61 +110,68 @@ function keyUpHandlerLeftPaddle(e) {
   }
 }
 
-function shifLeftPaddle() {
-  if (leftDownPressed) {
-    startPositionOfLeftPaddleY += 7;
-    if (startPositionOfLeftPaddleY + paddleHeight > canvas.height) {
-      startPositionOfLeftPaddleY = canvas.height - paddleHeight;
+// mouvement des raquettes dans le canvas
+function movePaddle(paddle, upPressed, downPressed) {
+  if (downPressed) {
+    paddle.y += 7;
+    if (paddle.y + paddleHeight > canvas.height) {
+      paddle.y = canvas.height - paddleHeight;
     }
-  } else if (leftUpPressed) {
-    startPositionOfLeftPaddleY -= 7;
-    if (startPositionOfLeftPaddleY < 0) {
-      startPositionOfLeftPaddleY = 0;
+  } else if(upPressed) {
+    paddle.y += -7;
+    if (paddle.y <0) {
+      paddle.y = 0;
     }
   }
 }
+// unification de l'appelle des deux fonctions movePaddle dans draw()
+function shiftPaddles() {
+  movePaddle(leftPaddle, leftUpPressed, leftDownPressed);
+  movePaddle(rightPaddle, rightUpPressed, rightDownPressed);
+}
 
+
+  
+// Collision des raquettes
 function paddleLeftCollision() {
   // Collision avec la raquette gauche
   if (
-      x - ballRadius < startPositionOfLeftPaddleX + paddleWidth &&
-      x + ballRadius > startPositionOfLeftPaddleX &&
-      y > startPositionOfLeftPaddleY &&
-      y < startPositionOfLeftPaddleY + paddleHeight
+      x - ballRadius < leftPaddle.x + paddleWidth &&
+      x + ballRadius > leftPaddle.x &&
+      y > leftPaddle.y &&
+      y < leftPaddle.y + paddleHeight
     ) {
       dx = -dx; // Inverser la direction horizontale
       if (
-        y - ballRadius < startPositionOfLeftPaddleY + paddleHeight &&
-        y + ballRadius > startPositionOfLeftPaddleY &&
-        x > startPositionOfLeftPaddleX &&
-        x < startPositionOfLeftPaddleX + paddleWidth
+        y - ballRadius < leftPaddle.y + paddleHeight &&
+        y + ballRadius > leftPaddle.y &&
+        x > leftPaddle.x &&
+        x < leftPaddle.x + paddleWidth
       ) {
         dy = -dy; // Inverser la direction verticale
         
       }
     }
 }
-
 function paddleRightCollision() {
   // Collision avec la raquette droite
   if (
-      x + ballRadius > startPositionOfRightPaddleX &&
-      x - ballRadius < startPositionOfRightPaddleX + paddleWidth &&
-      y > startPositionOfRightPaddleY &&
-      y < startPositionOfRightPaddleY + paddleHeight
+      x + ballRadius > rightPaddle.x &&
+      x - ballRadius < rightPaddle.x + paddleWidth &&
+      y > rightPaddle.y &&
+      y < rightPaddle.y + paddleHeight
   ) {
       dx = -dx; // Inverser la direction horizontale
       if (
-          y + ballRadius > startPositionOfRightPaddleY &&
-          y - ballRadius < startPositionOfRightPaddleY + paddleHeight &&
-          x > startPositionOfRightPaddleX &&
-          x < startPositionOfRightPaddleX + paddleWidth
+          y + ballRadius > rightPaddle.y &&
+          y - ballRadius < rightPaddle.y + paddleHeight &&
+          x > rightPaddle.x &&
+          x < rightPaddle.x + paddleWidth
       ) {
           dy = -dy; // Inverser la direction verticale
       }
   }
 }
-
 function paddleCollision() {
   paddleLeftCollision()
   paddleRightCollision()
@@ -286,17 +261,23 @@ function drawtips() {
 function draw() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-  drawLeftPaddle();
-  drawRightPaddle();
+  // drawLeftPaddle();
+  // drawRightPaddle();
+  drawPaddle(rightPaddle);
+  drawPaddle(leftPaddle);
+  
   drawBall();
-  bounceWall()
+ 
+  bounceWall();
+  shiftPaddles();
   paddleCollision();
-  // drawtips()
+
   drawScore()
   scoreGame()
+ 
 
-  shifRightPaddle();
-  shifLeftPaddle();
+  // shifRightPaddle();
+  // shifLeftPaddle();
   x += dx;
   y += dy;
 }

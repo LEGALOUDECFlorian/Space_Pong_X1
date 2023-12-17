@@ -3,6 +3,8 @@ console.log("hello");
 // mise en place et definition du canvas
 const canvas = document.getElementById("myCanvas");
 const ctx = canvas.getContext("2d");
+// demarrage du jeu
+let gameStarted = false;
 // infos de la raquette
 const paddleHeight = 75;
 const paddleWidth = 10;
@@ -48,13 +50,28 @@ let rightUpPressed = false;
 let rightDownPressed = false;
 let leftUpPressed = false;
 let leftDownPressed = false;
+// gestionnaires d'événements pour détecter le début du jeu
+document.addEventListener("keydown", startGame, false);
 // gestionnaires d'événements pour le déplacement de la raquette de droite
 document.addEventListener("keydown", keyDownHandlerRightPaddle, false);
 document.addEventListener("keyup", keyUpHandlerRightPaddle, false);
 // gestionnaires d'événements pour le déplacement de la raquette de droite
 document.addEventListener("keydown", keyDownHandlerLeftPaddle, false);
 document.addEventListener("keyup", keyUpHandlerLeftPaddle, false);
+//demarrage du jeu
+function startGame(e) {
+  if (e.key === "g" || e.key === "Enter") {
+    gameStarted = true ;
 
+     // Supprimez les écouteurs d'événements pour éviter de redémarrer le jeu plusieurs fois
+    // document.removeEventListener("keydown", startGame);
+  }
+}
+function updateSpeedBall() {
+  dx += 0.1;
+  dy += -0.1;
+  
+}
 // gestion de la collision contre les murs
 function bounceWall() {
   //rebond de la balle sur les murs inferieur || supérieur
@@ -138,6 +155,7 @@ function paddleLeftCollision() {
       y < leftPaddle.y + paddleHeight
     ) {
       dx = -dx; // Inverser la direction horizontale
+      
       if (
         y - ballRadius < leftPaddle.y + paddleHeight &&
         y + ballRadius > leftPaddle.y &&
@@ -145,6 +163,7 @@ function paddleLeftCollision() {
         x < leftPaddle.x + paddleWidth
       ) {
         dy = -dy; // Inverser la direction verticale
+        updateSpeedBall()
         
       }
     }
@@ -158,6 +177,7 @@ function paddleRightCollision() {
       y < rightPaddle.y + paddleHeight
   ) {
       dx = -dx; // Inverser la direction horizontale
+      
       if (
           y + ballRadius > rightPaddle.y &&
           y - ballRadius < rightPaddle.y + paddleHeight &&
@@ -165,6 +185,7 @@ function paddleRightCollision() {
           x < rightPaddle.x + paddleWidth
       ) {
           dy = -dy; // Inverser la direction verticale
+          updateSpeedBall()
       }
   }
 }
@@ -174,7 +195,28 @@ function paddleCollision() {
   
 }
 
+// function ajustingCollision(paddle) {
+//   // Ajustez la nouvelle direction horizontale de la balle en fonction de l'endroit où la balle a frappé la raquette
+//   let relativeIntersectY = y - (paddle.y + paddleWidth / 2);
+//   let normalizedRelativeIntersectY = relativeIntersectY / (paddleHeight / 2);
+//   dx = -dx; // Inversez la direction horizontale
 
+//   // Ajustez la direction verticale en fonction de l'endroit où la balle a frappé la raquette
+//   dy = normalizedRelativeIntersectY * 4; // Ajustez le facteur selon vos besoins
+// }
+
+// function addCollision() {
+//   ajustingCollision (leftPaddle);
+//   ajustingCollision (rightPaddle);
+// }
+
+function resetPaddles() {
+  leftPaddle.x = canvas.width / 6 - paddleHeight;
+  leftPaddle.y = (canvas.height - paddleHeight) / 2;
+  
+  rightPaddle.x = canvas.width - leftPaddle.x - paddleWidth;
+  rightPaddle.y = (canvas.height - paddleHeight) / 2;
+}
 
 
 
@@ -187,16 +229,18 @@ function resetBall() {
 
 function updateScore(player) {
   scores[player] += 1;
-  
+  gameStarted = false ;
 }
 
 function checkScore() {
   if (x + dx < ballRadius) {
     updateScore(1);
     resetBall(); 
+    resetPaddles()
   } else if (x + dx > canvas.width - ballRadius ) {
     updateScore(0);
     resetBall(); 
+    resetPaddles()
   } 
 }
 // dessiner les scores
@@ -207,6 +251,20 @@ function drawScore() {
   ctx.fillText(scores[0], 38, 60)
   ctx.fillText("Player 2 :", 830, 40);
   ctx.fillText(scores[1], 882, 60)
+}
+//fin de parti
+function endPlay() {
+ 
+  if (scores[0] === 5) {
+    alert("Player 1 \n WIN !")
+    document.location.reload();
+            clearInterval(interval); //
+  }
+  if (scores[1] === 5) {
+    alert("Player 2 \n WIN !")
+    document.location.reload();
+            clearInterval(interval); //
+  }
 }
 // truc pour faire des essaies
 function drawtips() {
@@ -250,17 +308,20 @@ function draw() {
 
   drawPaddle(rightPaddle);
   drawPaddle(leftPaddle);
-  
   drawBall();
- 
   bounceWall();
   shiftPaddles();
   paddleCollision();
+  addCollision();
   checkScore();
-  drawScore()
- 
-  x += dx;
-  y += dy;
+  drawScore();
+  if (gameStarted) {
+    x += dx;
+    y += dy;
+  } 
+  endPlay() 
+  // x += dx;
+  // y += dy;
 }
 
 const interval = setInterval(draw, 10);
@@ -271,3 +332,5 @@ const interval = setInterval(draw, 10);
 //     document.location.reload();
 //     clearInterval(interval); // Needed for Chrome to end game
 //   }
+// let dx = randomStartLuncher();
+// let dy = randomStartLuncher();

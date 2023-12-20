@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <!-- Méta-informations de la page -->
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <!-- Titre de la page -->
+    <title>Socket.IO chat</title>
+    <!-- Styles CSS en ligne -->
+    <style>
+      /* Styles pour le corps de la page */
+      body { margin: 0; padding-bottom: 3rem; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+
+      /* Styles pour le formulaire de saisie du message */
+      #form { background: rgba(0, 0, 0, 0.15); padding: 0.25rem; position: fixed; bottom: 0; left: 0; right: 0; display: flex; height: 3rem; box-sizing: border-box; backdrop-filter: blur(10px); }
+      #input { border: none; padding: 0 1rem; flex-grow: 1; border-radius: 2rem; margin: 0.25rem; }
+      #input:focus { outline: none; }
+      #form > button { background: #333; border: none; padding: 0 1rem; margin: 0.25rem; border-radius: 3px; outline: none; color: #fff; }
+
+      /* Styles pour la liste des messages */
+      #messages { list-style-type: none; margin: 0; padding: 0; }
+      #messages > li { padding: 0.5rem 1rem; }
+      #messages > li:nth-child(odd) { background: #efefef; }
+    </style>
+  </head>
+  <body>
+    <!-- Conteneur pour la liste des messages -->
+    <ul id="messages"></ul>
+    <!-- Formulaire d'envoi de message -->
+    <form id="form" action="">
+      <!-- Champ de saisie du message -->
+      <input id="input" autocomplete="off" />
+      <!-- Bouton d'envoi -->
+      <button>Send</button>
+    </form>
+    <!-- Inclusion de la bibliothèque Socket.IO -->
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+      // Variable de compteur pour générer des identifiants uniques côté client
+      let counter = 0;
+  
+      // Initialisation de la connexion Socket.IO avec des options spécifiques
+      const socket = io({
+        ackTimeout: 10000,  // Délai d'attente pour les accusés de réception
+        retries: 3,         // Nombre de tentatives de reconnexion
+        auth: {
+          serverOffset: 0   // Offset initial côté serveur
+        }
+      });
+  
+      // Récupération des éléments HTML
+      const form = document.getElementById('form');
+      const input = document.getElementById('input');
+      const messages = document.getElementById('messages');
+  
+      // Gestionnaire d'événement pour le formulaire d'envoi de message
+      form.addEventListener('submit', (e) => {
+        e.preventDefault();
+        // Vérification du champ de saisie non vide
+        if (input.value) {
+          // Génération d'un identifiant unique côté client
+          const clientOffset = `${socket.id}-${counter++}`;
+          // Émission de l'événement 'chat message' avec le message et l'identifiant client
+          socket.emit('chat message', input.value, clientOffset);
+          // Effacement du champ de saisie
+          input.value = '';
+        }
+      });
+  
+      // Gestionnaire d'événement pour l'événement 'chat message'
+      socket.on('chat message', (msg, serverOffset) => {
+        // Création d'un élément de liste pour le nouveau message
+        const item = document.createElement('li');
+        // Ajout du texte du message à l'élément de liste
+        item.textContent = msg;
+        // Ajout de l'élément de liste à la liste des messages
+        messages.appendChild(item);
+        // Défilement vers le bas pour afficher le nouveau message
+        window.scrollTo(0, document.body.scrollHeight);
+        // Mise à jour de l'offset côté serveur dans les données d'authentification
+        socket.auth.serverOffset = serverOffset;
+      });
+    </script>
+  </body>
+</html>

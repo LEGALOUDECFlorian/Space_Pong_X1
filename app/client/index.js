@@ -303,7 +303,8 @@
 //   const minutes = Math.floor(seconds / 60);
 //   const remainingSeconds = Math.floor(seconds % 60);
 //   const milliseconds = Math.floor((seconds % 1) * 100).toString().padStart(2, "0");
-//   const formattedTime = `${minutes}m${remainingSeconds < 10 ? "0" : ""}${remainingSeconds}s${milliseconds}`;
+//   const formattedTime = `
+// ${minutes}m${remainingSeconds < 10 ? "0" : ""}${remainingSeconds}s${milliseconds}`;
 //   return formattedTime;
 // }
 // // Fonction pour afficher le compteur central
@@ -386,10 +387,7 @@
 
 /* eslint-disable no-use-before-define */
 /* eslint-disable no-param-reassign */
-//import { client } from "./data/mongo-client.js";
-//const client = require("./data/mongo-client.js");
 
-console.log("hello");
 // mise en place et definition du canvas
 const canvas = document.getElementById("myCanvas");
 const ctx = canvas.getContext("2d");
@@ -447,6 +445,17 @@ let rightUpPressed = false;
 let rightDownPressed = false;
 let leftUpPressed = false;
 let leftDownPressed = false;
+
+// ==== START GAME ===
+const interval = setInterval(draw, 10);
+// gestionnaires d'événements pour détecter le début du jeu
+document.addEventListener("keydown", startGame, false);
+// gestionnaires d'événements pour le déplacement de la raquette de droite
+document.addEventListener("keydown", keyDownHandlerRightPaddle, false);
+document.addEventListener("keyup", keyUpHandlerRightPaddle, false);
+// gestionnaires d'événements pour le déplacement de la raquette de droite
+document.addEventListener("keydown", keyDownHandlerLeftPaddle, false);
+document.addEventListener("keyup", keyUpHandlerLeftPaddle, false);
 
 // demarrage du jeu
 function startGame(e) {
@@ -624,7 +633,7 @@ function updateScore(player) {
 
   //   xhr.onload = function () {
   //     if (xhr.status === 200) {
-  //       Swal.fire("Score enregistré !", "", "success"); // Message de confirmation d'enregistrement
+//       Swal.fire("Score enregistré !", "", "success"); // Message de confirmation d'enregistrement
   //     } else {
   //       Swal.fire("Erreur", "Une erreur est survenue", "error"); // Message d'erreur
   //     }
@@ -868,16 +877,12 @@ async function getHighScoresFromMongoDB() {
 
 // Fonction pour ajouter le score côté client
 async function addScoreToMongoDB(userData) {
-  console.log("addScoreToMongoDB userData", userData);
   try {
     const response = await fetch("/highscores", {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify(userData),
     });
-    console.log("response", response);
     if (response.ok) {
       console.log("Score added successfully.");
     } else {
@@ -890,35 +895,31 @@ async function addScoreToMongoDB(userData) {
 
 // fin de parti
 function endPlay() {
-  const formattedTime = formatTime(totalElapsedTime);
-  if (scores[0] === 5 || scores[1] === 5) {
+  if (scores[0] === 1 || scores[1] === 1) {
+    clearInterval(interval);
+    const formattedTime = formatTime(totalElapsedTime);
     const playerText = scores[0] === 5 ? "Player 1" : "Player 2";
     const response = confirm(`${playerText}\n WIN in ${formattedTime}!\n Do you want to enter your nickname in the high score table?`);
-    console.log(response);
     if (response === true) {
       const userName = prompt("Your nickname here");
       const userData = {
         nickname: userName,
         time: formattedTime,
       };
-      console.log("endPlay userData", userData);
       addScoreToMongoDB(userData)
         .then(() => {
-          console.log("Score added successfully!");
           alert("Score added successfully!");
           document.location.reload();
-          clearInterval(interval);
         })
         .catch((error) => {
-          console.error("Error adding score:", error);
+          alert(error);
+          document.location.reload();
         });
     } else {
       document.location.reload();
-      clearInterval(interval);
     }
   }
 }
-
 
 // if (scores[1] === 5) {
 //   const userName = prompt(`Player 2 \n WIN in ${formattedTime}!`);
@@ -949,14 +950,3 @@ function draw() {
   }
   endPlay();
 }
-
-const interval = setInterval(draw, 10);
-
-// gestionnaires d'événements pour détecter le début du jeu
-document.addEventListener("keydown", startGame, false);
-// gestionnaires d'événements pour le déplacement de la raquette de droite
-document.addEventListener("keydown", keyDownHandlerRightPaddle, false);
-document.addEventListener("keyup", keyUpHandlerRightPaddle, false);
-// gestionnaires d'événements pour le déplacement de la raquette de droite
-document.addEventListener("keydown", keyDownHandlerLeftPaddle, false);
-document.addEventListener("keyup", keyUpHandlerLeftPaddle, false);

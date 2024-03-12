@@ -3,26 +3,31 @@
 <head>
     <meta Content-Type="text/javascript" charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/styles.css"/>
     <title>Pong-like</title>
-    <style>
-        * {
-          padding: 0;
-          margin: 0;
-        }
-        canvas {
-          background: #eee;
-          display: block;
-          margin: 9rem auto;
-        }
-      </style>
+
 </head>
 <body>
-    <h1>Coucou</h1>
-     
+  <div class="main">
+  <div class="title-box">
+    <h1>Space Pong</h1>
+  </div>   
     <canvas id="myCanvas" width="920" height="640"
-    style="background: url(/images/Wallpaper\ pixel\ art\ \(1\).jpg) no-repeat center center;" >
+    style="background: url(/images/Default_background_for_video_game_pixel_art_design_arena_game_0.jpg) no-repeat center center;" >
     </canvas>
 
+    <section>
+      <div class="text-box">
+        <p>Player 1 <br/> use Q and W <br/> for move</p>
+      </div>
+      <div class="text-box">
+        <p>PRESS <br/> "ENTER or G" <br/> for PLAY</p>
+      </div>
+      <div class="text-box">
+        <p>Player 2 <br/> use Q and W <br/> for move</p>
+      </div>
+    </section>
+  </div>
 
     <script type='text/javascript' src="index.js"></script>
 

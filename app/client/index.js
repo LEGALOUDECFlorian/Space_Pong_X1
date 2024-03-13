@@ -6,15 +6,14 @@ const canvas = document.getElementById("myCanvas");
 const ctx = canvas.getContext("2d");
 // demarrage du jeu
 let gameStarted = false;
-/// //////////////////
+
 // Variables pour le temp total écoulé pendant la parti
 let startTime;
 let totalElapsedTime = 0;
-/// ///////////////////
 
 // infos de la raquette
-const paddleHeight = 75;
-const paddleWidth = 10;
+const paddleHeight = (12.8 / 100) * canvas.height;
+const paddleWidth = (1.5 / 100) * canvas.width;
 // infos sur les raquettes
 const leftPaddle = {
   x: canvas.width / 6 - paddleHeight,
@@ -28,7 +27,7 @@ const rightPaddle = {
 };
 
 // info de la balle
-const ballRadius = 10;
+const ballRadius = (1.2 / 100) * canvas.width;
 const ballColor = "#D742F5";
 // coordonnées de depart de la balle
 let x = canvas.width / 2;

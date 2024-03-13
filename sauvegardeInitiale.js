@@ -1,7 +1,3 @@
-// import { interval } from "../game/index.init.js";
-// init() = interval;
-// console.log("index.js");
-
 console.log("hello");
 // mise en place et definition du canvas
 const canvas = document.getElementById("myCanvas");
@@ -75,10 +71,7 @@ document.addEventListener("keyup", keyUpHandlerLeftPaddle, false);
 function startGame(e) {
   if (e.key === "g" || e.key === "Enter") {
     gameStarted = true;
-    //
     startTime = new Date().getTime();
-    // Supprime les écouteurs d'événements pour éviter de redémarrer le jeu plusieurs fois
-    // document.removeEventListener("keydown", startGame);
   }
 }
 

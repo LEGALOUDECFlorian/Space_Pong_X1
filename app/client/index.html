@@ -1,20 +1,30 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta Content-Type="text/javascript" charset="UTF-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="/styles.css"/>
     <title>Pong-like</title>
-
 </head>
 <body>
   <div class="main">
-  <div class="title-box">
-    <h1>Space Pong</h1>
-  </div>   
+    <div class="title-box">
+      <h1>Space Pong</h1>
+    </div>   
     <canvas id="myCanvas" width="920" height="640"
-    style="background: url(/images/Default_background_for_video_game_pixel_art_design_arena_game_0.jpg) no-repeat center center;" >
+      style="background: url(/images/Default_background_for_video_game_pixel_art_design_arena_game_0.jpg) no-repeat center center;">
     </canvas>
+
+    <div id="modal" class="modal hidden">
+      <div id="modalContent" class="modal-content">
+        <h2>Attention</h2>
+        <p>Ce jeu nécessite l'utilisation d'un clavier pour être joué.<br/>
+           Nous vous invitons à appuyer sur le bouton Fermer<br/>
+           et ainsi revenir a la page précédente.  
+        </p>
+        <button id="closeModal">Fermer</button>
+      </div>
+    </div>
 
     <section>
       <div class="text-box">
@@ -29,8 +39,6 @@
     </section>
   </div>
 
-    <script type='text/javascript' src="index.js"></script>
-
-    
+  <script type='text/javascript' src="index.js"></script>
 </body>
 </html>

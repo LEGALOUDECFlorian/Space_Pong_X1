@@ -1,9 +1,38 @@
 /* eslint-disable no-use-before-define */
 /* eslint-disable no-param-reassign */
 
-// mise en place et definition du canvas
 const canvas = document.getElementById("myCanvas");
+const modal = document.getElementById("modal");
+const closeModalButton = document.getElementById("closeModal");
+
+// Lancement de la fonction qui vérifie la taille de l'écran au chargement de la page
+checkScreenSize();
+
+// Vérifie la taille de l'écran lors du redimensionnement de la fenêtre
+window.addEventListener("resize", checkScreenSize);
+
+// Fonction qui vérifie la taille de l'écran et afficher/masquer la modale et le canvas
+function checkScreenSize() {
+  if (window.innerWidth < 920) {
+    // Masque le canvas et afficher la modale
+    canvas.classList.add("hidden");
+    modal.classList.remove("hidden");
+  } else {
+    // Affiche le canvas et masquer la modale
+    canvas.classList.remove("hidden");
+    modal.classList.add("hidden");
+  }
+}
+
+// Ferme la modale lorsque l'utilisateur clique sur le bouton de fermeture
+closeModalButton.addEventListener("click", () => {
+  window.history.back(); // Revenir à la page précédente
+});
+
+// Initialisation du canvas sur la page html
+// const canvas = document.getElementById("myCanvas");
 const ctx = canvas.getContext("2d");
+
 // demarrage du jeu
 let gameStarted = false;
 

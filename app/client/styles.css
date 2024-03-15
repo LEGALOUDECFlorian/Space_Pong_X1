@@ -62,6 +62,9 @@ canvas {
   margin: 3rem auto;
   border-radius: 2%;
   box-shadow: 1px 1px 0.5rem rgba(255, 119, 0, 0.8);
+  background-image: url("/images/Default_background_for_video_game_pixel_art_design_arena_game_0.jpg");
+  background-repeat: no-repeat;
+  background-position: center;
 }
 
 /* modal */

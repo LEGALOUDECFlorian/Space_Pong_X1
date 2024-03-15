@@ -1,7 +1,10 @@
 /* eslint-disable no-use-before-define */
 /* eslint-disable no-param-reassign */
 
+// Initialisation du canvas sur la page html
 const canvas = document.getElementById("myCanvas");
+const ctx = canvas.getContext("2d");
+
 const modal = document.getElementById("modal");
 const closeModalButton = document.getElementById("closeModal");
 
@@ -13,7 +16,7 @@ window.addEventListener("resize", checkScreenSize);
 
 // Fonction qui vérifie la taille de l'écran et afficher/masquer la modale et le canvas
 function checkScreenSize() {
-  if (window.innerWidth < 920) {
+  if (window.innerWidth < 820) {
     // Masque le canvas et afficher la modale
     canvas.classList.add("hidden");
     modal.classList.remove("hidden");
@@ -29,16 +32,15 @@ closeModalButton.addEventListener("click", () => {
   window.history.back(); // Revenir à la page précédente
 });
 
-// Initialisation du canvas sur la page html
-// const canvas = document.getElementById("myCanvas");
-const ctx = canvas.getContext("2d");
-
 // demarrage du jeu
 let gameStarted = false;
 
 // Variables pour le temp total écoulé pendant la parti
 let startTime;
 let totalElapsedTime = 0;
+
+// initialisation du score
+const scores = [0, 0];
 
 // infos de la raquette
 const paddleHeight = (12.8 / 100) * canvas.height;
@@ -70,17 +72,13 @@ function randomStartLuncher() {
   const randomNumber = parseInt(numbers[Math.floor(Math.random() * 3)], 10);
   return randomDirection === "+" ? randomNumber : -randomNumber;
 }
-// initialisation du score
-const scores = [0, 0];
-
 // direction du mouvement de la balle
-
 const moveBall = {
   dx: randomStartLuncher(),
   dy: randomStartLuncher(),
 };
-// let dx = 2;
-// let dy = -2;
+console.log("moveBall", moveBall);
+// Etat de départ des touches
 let rightUpPressed = false;
 let rightDownPressed = false;
 let leftUpPressed = false;
@@ -108,14 +106,14 @@ function startGame(e) {
 // augmentation de la vitesse de la balle
 function updateSpeedBall() {
   if (moveBall.dx < 0) {
-    moveBall.dx += -0.01;
+    moveBall.dx += -0.05;
   } else {
-    moveBall.dx += 0.01;
+    moveBall.dx += 0.05;
   }
   if (moveBall.dy > 0) {
-    moveBall.dy += 0.01;
+    moveBall.dy += 0.05;
   } else {
-    moveBall.dy += -0.01;
+    moveBall.dy += -0.05;
   }
   return moveBall;
 }
@@ -200,7 +198,7 @@ function paddleLeftCollision() {
     && y < leftPaddle.y + paddleHeight
   ) {
     moveBall.dx = -moveBall.dx; // Inverse la direction horizontale
-    updateSpeedBall(moveBall.dx, moveBall.dy);
+    updateSpeedBall(moveBall.dx);
     if (
       y - ballRadius < leftPaddle.y + paddleHeight
       && y + ballRadius > leftPaddle.y
@@ -220,8 +218,7 @@ function paddleRightCollision() {
     && y < rightPaddle.y + paddleHeight
   ) {
     moveBall.dx = -moveBall.dx; // Inverse la direction horizontale
-
-    updateSpeedBall(moveBall.dx, moveBall.dy);
+    updateSpeedBall(moveBall.dx);
     if (
       y + ballRadius > rightPaddle.y
       && y - ballRadius < rightPaddle.y + paddleHeight
@@ -256,12 +253,12 @@ function resetBall() {
 function updateScore(player) {
   scores[player] += 1;
   gameStarted = false;
-  startTime = null; // Réinitialisez startTime
+  startTime = null;
 }
 
 function checkScore() {
   if (scores[0] === 5 || scores[1] === 5) {
-    // Réinitialiser le temps écoulé total
+    // Réinitialise le temps écoulé total
     totalElapsedTime = 0;
   }
   if (x + moveBall.dx < ballRadius) {
@@ -328,22 +325,22 @@ function drawCenterCounter() {
   ctx.beginPath();
   ctx.font = "24px Arial";
   ctx.fillStyle = "#eee";
-  const text1 = "Time:";
-  const text2 = `${formattedTime}`;
+  const textUp = "Time:";
+  const textDown = `${formattedTime}`;
 
-  const text1Width = ctx.measureText(text1).width;
-  const text2Width = ctx.measureText(text2).width;
+  const textUpWidth = ctx.measureText(textUp).width;
+  const textDownWidth = ctx.measureText(textDown).width;
 
   // Position verticale des textes
-  const text1Y = 40;
-  const text2Y = 65;
+  const textUpY = 40;
+  const textDownY = 65;
 
   // Position horizontale des textes sur le canva
-  const text1X = canvas.width / 2 - text1Width / 2;
-  const text2X = canvas.width / 2 - text2Width / 2;
+  const textUpX = canvas.width / 2 - textUpWidth / 2;
+  const textDownX = canvas.width / 2 - textDownWidth / 2;
 
-  ctx.fillText(text1, text1X, text1Y);
-  ctx.fillText(text2, text2X, text2Y);
+  ctx.fillText(textUp, textUpX, textUpY);
+  ctx.fillText(textDown, textDownX, textDownY);
 
   ctx.closePath();
 }
@@ -352,7 +349,7 @@ function updateElapsedTime() {
   if (gameStarted) {
     const currentTime = new Date().getTime();
     const elapsedTimeSinceLastUpdate = (currentTime - startTime) / 1000;
-    totalElapsedTime += elapsedTimeSinceLastUpdate; // Mettre à jour le temps écoulé total
+    totalElapsedTime += elapsedTimeSinceLastUpdate; // Met à jour le temps écoulé total
     startTime = currentTime;
   }
 }
@@ -389,7 +386,7 @@ async function addScoreToMongoDB(userData) {
 
 // fin de parti
 function endPlay() {
-  if (scores[0] === 1 || scores[1] === 1) {
+  if (scores[0] === 5 || scores[1] === 5) {
     clearInterval(interval);
     const formattedTime = formatTime(totalElapsedTime);
     const playerText = scores[0] === 5 ? "Player 1" : "Player 2";
@@ -410,7 +407,9 @@ function endPlay() {
         })
         .then((bestScores) => {
           // Formate les scores récupérés pour l'affichage de ceux-ci
-          const bestScoresText = bestScores.map((score, index) => `${index + 1}. ${score.nickname} - ${score.time}`).join("\n");
+          const bestScoresText = bestScores
+            .map((score, index) => `${index + 1}. ${score.nickname} - ${score.time}`)
+            .join("\n");
 
           // Affiche les meilleurs scores dans une alerte
           alert(`High Scores:\n${bestScoresText}`);
@@ -431,18 +430,15 @@ function endPlay() {
 // peindre le jeu
 function draw() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
-
   drawPaddle(rightPaddle);
   drawPaddle(leftPaddle);
   drawBall();
   bounceWall();
   shiftPaddles();
-
   paddleCollision();
-
   checkScore();
   drawScore();
-  updateElapsedTime(); // Mettre à jour le temps écoulé à chaque frame
+  updateElapsedTime();
   drawCenterCounter();
   if (gameStarted) {
     x += moveBall.dx;

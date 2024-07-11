@@ -45,6 +45,7 @@ const scores = [0, 0];
 // infos de la raquette
 const paddleHeight = (12.8 / 100) * canvas.height;
 const paddleWidth = (1.5 / 100) * canvas.width;
+
 // infos sur les raquettes
 const leftPaddle = {
   x: canvas.width / 6 - paddleHeight,
@@ -77,7 +78,7 @@ const moveBall = {
   dx: randomStartLuncher(),
   dy: randomStartLuncher(),
 };
-console.log("moveBall", moveBall);
+
 // Etat de départ des touches
 let rightUpPressed = false;
 let rightDownPressed = false;
@@ -123,10 +124,6 @@ function bounceWall() {
   if (y + moveBall.dy > canvas.height - ballRadius || y + moveBall.dy < ballRadius) {
     moveBall.dy = -moveBall.dy;
   }
-  // rebond de la balle sur les murs droite || gauche
-  // if (x + dx > canvas.width - ballRadius || x + dx < ballRadius) {
-  // dx = -dx;
-  // }
 }
 // fonctions relative au déplacement de la raquette droite
 function keyDownHandlerRightPaddle(e) {
@@ -280,18 +277,6 @@ function drawScore() {
   ctx.fillText("Player 2 :", 830, 40);
   ctx.fillText(scores[1], 874, 60);
 }
-// truc pour faire des essaies
-// function drawtips() {
-//   // créer un nouvel objet image à utiliser comme modèle
-//   const img = new Image();
-//   img.src = "https://c4.wallpaperflare.com/wallpaper/796/698/345/artistic-pixel-art-8-bit-wallpaper-preview.jpg";
-//   img.onload = function () {
-//     // créer le modèle
-//     const ptrn = ctx.createPattern(img, "repeat");
-//     ctx.fillStyle = ptrn;
-//     ctx.fillRect(0, 0, 920, 640);
-//   };
-// }
 
 // fonction pour dessiner une raquette
 function drawPaddle(paddle) {
@@ -390,9 +375,10 @@ function endPlay() {
     clearInterval(interval);
     const formattedTime = formatTime(totalElapsedTime);
     const playerText = scores[0] === 5 ? "Player 1" : "Player 2";
-    const response = confirm(`${playerText}\n WIN in ${formattedTime}!\n Do you want to enter your nickname in the high score table?`);
+    const response = confirm(` ${playerText} WIN \n YOU HELD ${formattedTime}!\n Do you want to enter your nickname in the Best Times table?`);
     if (response === true) {
-      const userName = prompt("Your nickname here");
+      let userName = prompt("Your nickname here");
+      userName = userName ? userName != "" : "Anonyme";
       const userData = {
         nickname: userName,
         time: formattedTime,
@@ -400,7 +386,7 @@ function endPlay() {
       // Ajoute le score à MongoDB
       addScoreToMongoDB(userData)
         .then(() => {
-          alert("Score added successfully!");
+          alert("Your time added successfully!");
 
           // Récupère les meilleurs scores après l'ajout du nouveau score
           return getHighScoresFromMongoDB();
@@ -412,7 +398,7 @@ function endPlay() {
             .join("\n");
 
           // Affiche les meilleurs scores dans une alerte
-          alert(`High Scores:\n${bestScoresText}`);
+          alert(`Best Time:\n${bestScoresText}`);
 
           // Recharge la page
           document.location.reload();

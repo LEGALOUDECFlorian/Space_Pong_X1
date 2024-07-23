@@ -16,7 +16,7 @@ const app = express();
 const mongoUri = process.env.MONGO_URI;
 
 // Serve static assets
-app.use(express.static(path.join(__dirname, "../dist")));
+app.use(express.static(path.join(__dirname, "../client")));
 
 // Add body parser
 app.use(bodyParser.json());

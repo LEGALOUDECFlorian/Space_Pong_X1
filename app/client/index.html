@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/styles.css"/>
+    <title>Pong-like</title>
+</head>
+<body>
+  <div class="main">
+    <div class="title-box">
+      <h1>Space Pong</h1>
+    </div>   
+    
+    <canvas id="myCanvas" width="920" height="640"></canvas>
+
+    <div id="modal" class="modal hidden">
+      <div id="modalContent" class="modal-content">
+        <h2>Attention</h2>
+        <p>Ce jeu nécessite l'utilisation d'un clavier pour être joué.<br/>
+           Nous vous invitons à appuyer sur le bouton Fermer<br/>
+           et ainsi revenir a la page précédente.  
+        </p>
+        <button id="closeModal">Fermer</button>
+      </div>
+    </div>
+
+    <section>
+      <div class="text-box">
+        <p>Player 1 <br/> use Q and W <br/> for move</p>
+      </div>
+      <div class="text-box">
+        <p>PRESS <br/> "ENTER or G" <br/> for PLAY</p>
+      </div>
+      <div class="text-box">
+        <p>Player 2 <br/> use ⬆ and ⬇ <br/> for move</p>
+      </div>
+    </section>
+  </div>
+
+  <script type='text/javascript' src="index.js"></script>
+</body>
+</html>

@@ -1,20 +1,15 @@
-const { MongoClient } = require("mongodb");
+const mongoose = require('mongoose') ;
 
-const MONGO_URL = process.env.MONGO_URL || "mongodb://localhost:27017";
-const DATABASE_NAME = process.env.DATABASE_NAME || "myponglikedb";
-
-const client = new MongoClient(MONGO_URL);
-
-async function connectToMongo() {
+async function connectToMongo(mongoUri) {
   try {
-    await client.connect();
-    console.log("Connected to MongoDB!");
-    const db = client.db(DATABASE_NAME);
-    return db;
+    mongoose.connect(mongoUri)
+       .then(() => console.log('Connexion à MongoDB réussie !'))
+       .catch(() => console.log('Connexion à MongoDB échouée !'));
+       return mongoose.connection;
   } catch (error) {
     console.error("Error connecting to MongoDB:", error);
     throw error;
   }
 }
 
-module.exports = { client, connectToMongo };
+module.exports = { connectToMongo };

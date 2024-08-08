@@ -45,6 +45,7 @@ app.use(bodyParser.json());
           .sort({ time: -1 }) // Sorts by descending time
           .limit(limit)
           .toArray();
+       //   console.log({highScores});
         res.json(highScores);
       } catch (error) {
         console.error("Erreur lors de la récupération des scores élevés :", error);
